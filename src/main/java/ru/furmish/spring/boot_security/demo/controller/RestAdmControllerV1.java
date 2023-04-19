@@ -1,6 +1,6 @@
 package ru.furmish.spring.boot_security.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,15 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin/api/v1")
+@RequiredArgsConstructor
 public class RestAdmControllerV1 {
+
     private final UserService userService;
     private final RoleService roleService;
-
-    @Autowired
-    public RestAdmControllerV1(UserService userService, RoleService roleService) {
-        this.userService = userService;
-        this.roleService = roleService;
-    }
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> allUsers() {
@@ -36,7 +32,7 @@ public class RestAdmControllerV1 {
     }
 
     @GetMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
         if (userService.getUserById(id) == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -54,21 +50,20 @@ public class RestAdmControllerV1 {
 
     @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> addUser(@RequestBody User user) {
-        HttpHeaders httpHeaders = new HttpHeaders();
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         userService.addUser(user);
-        return new ResponseEntity<>(user, httpHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>(user, new HttpHeaders(), HttpStatus.CREATED);
     }
+
     @PatchMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> editUser(@PathVariable("id") Long id, @RequestBody User user) {
-        HttpHeaders httpHeaders = new HttpHeaders();
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         userService.updateUser(user);
-        return new ResponseEntity<>(user, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(user, new HttpHeaders(), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

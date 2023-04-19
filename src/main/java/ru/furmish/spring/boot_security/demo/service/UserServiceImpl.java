@@ -1,5 +1,6 @@
 package ru.furmish.spring.boot_security.demo.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,17 +13,12 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserDao dao;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public UserServiceImpl(UserDao dao, RoleService roleService, @Lazy PasswordEncoder passwordEncoder) {
-        this.dao = dao;
-        this.roleService = roleService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<User> getUsers() {
@@ -67,7 +63,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private void setRolesForUser(User user) {
-        user.setRoles(user.getRoles().stream().map(role -> roleService.findByName(role.getName())).toList());
+        user.setRoles(
+                user.getRoles()
+                        .stream()
+                        .map(role -> roleService.findByName(role.getName()))
+                        .toList());
     }
 
     private void encodePassword(User user) {

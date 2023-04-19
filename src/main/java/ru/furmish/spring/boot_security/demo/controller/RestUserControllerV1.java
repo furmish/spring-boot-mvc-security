@@ -1,5 +1,6 @@
 package ru.furmish.spring.boot_security.demo.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +14,10 @@ import ru.furmish.spring.boot_security.demo.service.UserService;
 import java.security.Principal;
 @RestController
 @RequestMapping("/user/api/v1")
+@RequiredArgsConstructor
 public class RestUserControllerV1 {
 
     private final UserService userService;
-
-    public RestUserControllerV1(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUser(Principal principal) {

@@ -1,5 +1,6 @@
 package ru.furmish.spring.boot_security.demo.init;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.furmish.spring.boot_security.demo.model.Role;
@@ -12,15 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class InitDb {
-    private final UserService userService;
-    private final RoleService roleService;
 
-    @Autowired
-    public InitDb(UserService userService, RoleService roleService) {
-        this.userService = userService;
-        this.roleService = roleService;
-    }
+    private final UserService userService;
+
+    private final RoleService roleService;
 
     @PostConstruct
     public void postConstruct() {

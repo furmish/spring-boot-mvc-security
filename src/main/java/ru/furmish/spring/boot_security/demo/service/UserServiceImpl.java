@@ -1,7 +1,6 @@
 package ru.furmish.spring.boot_security.demo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,11 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserDao dao;
+
     private final RoleService roleService;
+
     @Lazy
     private PasswordEncoder passwordEncoder;
 

@@ -1,45 +1,53 @@
 package ru.furmish.spring.boot_security.demo.init;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.furmish.spring.boot_security.demo.model.Role;
-import ru.furmish.spring.boot_security.demo.service.RoleService;
-import ru.furmish.spring.boot_security.demo.service.UserService;
 import ru.furmish.spring.boot_security.demo.model.User;
+import ru.furmish.spring.boot_security.demo.service.UserService;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class InitDb {
-
     private final UserService userService;
 
-    private final RoleService roleService;
-
     @PostConstruct
-    public void postConstruct() {
-        List<User> users = userService.getUsers();
+    public void initUsers() {
+        final List<User> users = userService.getUsers();
         if (users.isEmpty()) {
-            Role adminRole = new Role("ROLE_ADMIN");
-            Role userRole = new Role("ROLE_USER");
-            roleService.addRole(adminRole);
-            roleService.addRole(userRole);
 
-            List<Role> testRoles = new ArrayList<>();
-            testRoles.add(adminRole);
-            testRoles.add(userRole);
-            List<Role> adminRoles = new ArrayList<>();
-            adminRoles.add(adminRole);
-            List<Role> userRoles = new ArrayList<>();
-            userRoles.add(userRole);
+            final var testUser = User
+                    .builder()
+                    .username("test")
+                    .email("test@test.com")
+                    .firstName("test")
+                    .lastName("test")
+                    .password("test")
+                    .roles(List.of(new Role("ROLE_ADMIN")))
+                    .build();
+            final var adminUser = User
+                    .builder()
+                    .username("admin")
+                    .email("admin@gmail.com")
+                    .firstName("admin")
+                    .lastName("admin")
+                    .password("admin")
+                    .roles(List.of(new Role("ROLE_ADMIN"), new Role("ROLE_USER")))
+                    .build();
+            final var user = User
+                    .builder()
+                    .username("user")
+                    .email("user@gmail.com")
+                    .firstName("user")
+                    .lastName("user")
+                    .password("user")
+                    .roles(List.of(new Role("ROLE_USER")))
+                    .build();
 
-            userService.addUser(new User("test", "test", "test", "test", "test@gmail.com", testRoles));
-            userService.addUser(new User("admin", "admin", "admin", "admin", "admin@gmail.com", adminRoles));
-            userService.addUser(new User("user", "user", "user", "user", "user@gmail.com", userRoles));
+            userService.saveAllUsers(List.of(user, testUser, adminUser));
         }
     }
 }

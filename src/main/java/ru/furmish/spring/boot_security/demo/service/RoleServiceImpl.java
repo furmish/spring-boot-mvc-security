@@ -1,38 +1,40 @@
 package ru.furmish.spring.boot_security.demo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.furmish.spring.boot_security.demo.dao.RoleDao;
+import ru.furmish.spring.boot_security.demo.repository.RoleRepository;
 import ru.furmish.spring.boot_security.demo.model.Role;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class RoleServiceImpl implements RoleService {
 
-    private final RoleDao roleDao;
+    private final RoleRepository repository;
 
     @Override
     public List<Role> getRolesList() {
-        return roleDao.setRoles();
+        return repository.findAll();
     }
 
     @Override
-    public Role findByName(String name) {
-        return roleDao.findByName(name);
+    public Role findByName(final String name) {
+        return repository
+                .findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Role with name '%s' not found", name)));
     }
 
     @Override
-    public Role findById(String id) {
-        return roleDao.findById(id);
+    public Role findById(final Long id) {
+        return repository
+                .findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Role with id '%d' not found", id)));
     }
 
     @Override
-    public void addRole(Role role) {
-        roleDao.createRole(role);
+    public void addRole(final Role role) {
+        repository.save(role);
     }
 }

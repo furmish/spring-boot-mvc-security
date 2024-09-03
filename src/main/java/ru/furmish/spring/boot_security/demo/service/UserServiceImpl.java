@@ -1,79 +1,83 @@
 package ru.furmish.spring.boot_security.demo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.furmish.spring.boot_security.demo.model.User;
-import ru.furmish.spring.boot_security.demo.dao.UserDao;
+import ru.furmish.spring.boot_security.demo.repository.UserRepository;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserDao dao;
-
-    private final RoleService roleService;
-
-    @Lazy
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<User> getUsers() {
-        return dao.listUsers();
+        return repository.findAll().stream()
+                         .sorted(Comparator.comparing(User::getId)).toList();
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return dao.getUserByEmail(email);
+    public User getUserByEmail(final String email) {
+        return repository.findByEmail(email)
+                         .orElseThrow(() -> new RuntimeException(
+                                 String.format("Пользователь с email - %s не найден!", email)));
     }
 
     @Override
-    public User getUserByUsername(String username) {
-        return dao.getUserByUsername(username);
+    public User getUserByUsername(final String username) {
+        return repository.findByUsername(username)
+                         .orElseThrow(() -> new RuntimeException(
+                                 String.format("Пользователь с username = %s не найден", username)));
     }
 
     @Override
-    public void addUser(User user) {
-        encodePassword(user);
-        setRolesForUser(user);
-        dao.createUser(user);
+    public void addUser(final User user) {
+        encodeUserPassword(user);
+        repository.save(user);
+    }
+
+    private void encodeUserPassword(final User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
     }
 
     @Override
-    public void removeUser(User user) {
-        dao.removeUser(user);
+    public void removeUser(final User user) {
+        repository.delete(user);
     }
 
     @Override
-    public User getUserById(long id) {
-        return dao.getUserById(id);
+    public User getUserById(final long id) {
+        return repository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("Пользователь с id = %d не найден!", id)));
     }
 
     @Override
-    public void updateUser(User user) {
-        User userFromDb = dao.getUserById(user.getId());
+    public void updateUser(final User user) {
+        final User userFromDb = repository
+                .findById(user.getId())
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("Пользователь с id = %d не найден!", user.getId())));
+
         if (!userFromDb.getPassword().equals(user.getPassword())) {
-            encodePassword(user);
+            userFromDb.setPassword(user.getPassword());
+            encodeUserPassword(userFromDb);
         }
-        setRolesForUser(user);
-        dao.updateUser(user);
+        userFromDb.setRoles(user.getRoles());
+
+        repository.save(user);
     }
 
-    private void setRolesForUser(User user) {
-        user.setRoles(
-                user.getRoles()
-                        .stream()
-                        .map(role -> roleService.findByName(role.getName()))
-                        .toList());
-    }
-
-    private void encodePassword(User user) {
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+    @Override
+    public void saveAllUsers(final List<User> users) {
+        users.forEach(this::encodeUserPassword);
+        repository.saveAll(users);
     }
 }

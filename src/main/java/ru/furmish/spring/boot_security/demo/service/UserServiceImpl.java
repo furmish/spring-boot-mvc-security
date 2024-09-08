@@ -26,14 +26,14 @@ public class UserServiceImpl implements UserService {
     public User getUserByEmail(final String email) {
         return repository.findByEmail(email)
                          .orElseThrow(() -> new RuntimeException(
-                                 String.format("Пользователь с email - %s не найден!", email)));
+                "Пользователь с email - %s не найден!".formatted(email)));
     }
 
     @Override
     public User getUserByUsername(final String username) {
         return repository.findByUsername(username)
                          .orElseThrow(() -> new RuntimeException(
-                                 String.format("Пользователь с username = %s не найден", username)));
+                "Пользователь с username = %s не найден".formatted(username)));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new RuntimeException(
-                        String.format("Пользователь с id = %d не найден!", id)));
+                "Пользователь с id = %d не найден!".formatted(id)));
     }
 
     @Override

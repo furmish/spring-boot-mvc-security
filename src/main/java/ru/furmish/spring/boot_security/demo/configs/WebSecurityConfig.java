@@ -2,35 +2,37 @@ package ru.furmish.spring.boot_security.demo.configs;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import ru.furmish.spring.boot_security.demo.service.UserService;
 
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
     private final SuccessUserHandler successUserHandler;
     private final UserService service;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().successHandler(successUserHandler)
-                .permitAll()
-                .and()
-                .logout()
-                .permitAll()
-                .logoutSuccessUrl("/login");
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .formLogin(login -> login.successHandler(successUserHandler).permitAll())
+                .authenticationProvider(daoAuthenticationProvider())
+                .logout(logout -> logout
+                        .permitAll()
+                        .logoutSuccessUrl("/login"));
+
+        return http.build();
     }
 
     @Bean
@@ -41,8 +43,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return daoAuthenticationProvider;
     }
 
-    @Override
-    protected void configure(final AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(daoAuthenticationProvider());
-    }
 }

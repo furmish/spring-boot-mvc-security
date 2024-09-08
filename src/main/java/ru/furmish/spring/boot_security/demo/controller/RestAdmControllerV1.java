@@ -5,13 +5,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.furmish.spring.boot_security.demo.model.Role;
 import ru.furmish.spring.boot_security.demo.model.User;
 import ru.furmish.spring.boot_security.demo.service.RoleService;
 import ru.furmish.spring.boot_security.demo.service.UserService;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -24,7 +24,7 @@ public class RestAdmControllerV1 {
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> allUsers() {
-        List<User> users = userService.getUsers();
+        final List<User> users = userService.getUsers();
         if (users == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -32,7 +32,7 @@ public class RestAdmControllerV1 {
     }
 
     @GetMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<User> getUser(@PathVariable final Long id) {
         if (userService.getUserById(id) == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -41,7 +41,7 @@ public class RestAdmControllerV1 {
 
     @GetMapping(value = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Role>> allRoles() {
-        List<Role> rolesList = roleService.getRolesList();
+        final List<Role> rolesList = roleService.getRolesList();
         if (rolesList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -49,7 +49,7 @@ public class RestAdmControllerV1 {
     }
 
     @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    public ResponseEntity<User> addUser(@RequestBody final User user) {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -58,7 +58,7 @@ public class RestAdmControllerV1 {
     }
 
     @PatchMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> editUser(@PathVariable("id") Long id, @RequestBody User user) {
+    public ResponseEntity<User> editUser(@PathVariable final Long id, @RequestBody final User user) {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -67,8 +67,8 @@ public class RestAdmControllerV1 {
     }
 
     @DeleteMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
-        User userById = userService.getUserById(id);
+    public ResponseEntity<User> deleteUser(@PathVariable final Long id) {
+        final User userById = userService.getUserById(id);
         if (userById == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -77,10 +77,10 @@ public class RestAdmControllerV1 {
     }
 
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getCurrentUser(Principal principal) {
-        if (userService.getUserByUsername(principal.getName()) == null) {
+    public ResponseEntity<User> getCurrentUser(final Authentication authentication) {
+        if (userService.getUserByUsername(authentication.getName()) == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(userService.getUserByUsername(principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUserByUsername(authentication.getName()), HttpStatus.OK);
     }
 }

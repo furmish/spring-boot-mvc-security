@@ -1,12 +1,12 @@
 package ru.furmish.spring.boot_security.demo.init;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.furmish.spring.boot_security.demo.model.Role;
 import ru.furmish.spring.boot_security.demo.model.User;
 import ru.furmish.spring.boot_security.demo.service.UserService;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component

@@ -18,7 +18,7 @@ CREATE TABLE users (
 
 CREATE TABLE users_roles (
     user_id  BIGINT NOT NULL,
-    roles_id BIGINT NOT NULL
+    role_id BIGINT NOT NULL
 )
 ;
 
@@ -31,7 +31,7 @@ ADD CONSTRAINT uc_users_username UNIQUE (username)
 ;
 
 ALTER TABLE users_roles
-ADD CONSTRAINT fk_userol_on_role FOREIGN KEY (roles_id) REFERENCES roles(id)
+ADD CONSTRAINT fk_userol_on_role FOREIGN KEY (role_id) REFERENCES roles(id)
 ;
 
 ALTER TABLE users_roles

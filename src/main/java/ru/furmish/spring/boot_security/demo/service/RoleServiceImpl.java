@@ -23,14 +23,14 @@ public class RoleServiceImpl implements RoleService {
         return repository
                 .findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Role with name '%s' not found", name)));
+                "Role with name '%s' not found".formatted(name)));
     }
 
     @Override
     public Role findById(final Long id) {
         return repository
                 .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Role with id '%d' not found", id)));
+                .orElseThrow(() -> new IllegalArgumentException("Role with id '%d' not found".formatted(id)));
     }
 
     @Override

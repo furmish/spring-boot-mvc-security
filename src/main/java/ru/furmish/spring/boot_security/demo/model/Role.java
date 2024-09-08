@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 
 @Getter
